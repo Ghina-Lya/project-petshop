@@ -9,14 +9,12 @@ export default function CartPage() {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   useEffect(() => {
-    // Ambil data keranjang dari localStorage browser
     const savedCart = localStorage.getItem('petshop_cart');
     if (savedCart) {
       setCartItems(JSON.parse(savedCart));
     }
   }, []);
 
-  // Fungsi pilih/centang produk untuk checkout
   const toggleSelect = (id: number) => {
     if (selectedItems.includes(id)) {
       setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
@@ -25,49 +23,51 @@ export default function CartPage() {
     }
   };
 
-  // Fungsi proses checkout item yang dipilih
   const handleCheckout = () => {
     if (selectedItems.length === 0) {
       alert('Pilih minimal satu produk untuk di-checkout!');
       return;
     }
 
-    // Filter produk yang tidak dipilih (artinya yang dipilih akan dihapus dari keranjang)
+    // Hapus produk yang dicentang dari keranjang
     const remainingItems = cartItems.filter((item) => !selectedItems.includes(item.id));
-    
     setCartItems(remainingItems);
     localStorage.setItem('petshop_cart', JSON.stringify(remainingItems));
     setSelectedItems([]);
-    
-    // Munculkan pop-up sukses
     setShowSuccessPopup(true);
   };
 
   return (
-    <div className="min-h-screen bg-purple-950 text-white p-6 sm:p-10 font-sans relative">
+    <div className="min-h-[75vh] py-8 space-y-6 relative font-sans">
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-xl sm:text-2xl font-bold text-orange-400">🛒 Keranjang Belanja Anda</h1>
+          <h1 className="text-2xl font-bold text-orange-400">🛒 Keranjang Belanja Anda</h1>
           <Link href="/home" className="bg-purple-800 hover:bg-purple-700 px-4 py-2 rounded-xl text-xs font-semibold transition">
             Lanjut Belanja
           </Link>
         </div>
 
         {cartItems.length > 0 ? (
-          <div className="bg-purple-900/60 border border-purple-800 rounded-3xl p-6 shadow-xl backdrop-blur-md space-y-4">
+          <div className="bg-purple-950/60 border border-purple-800/80 rounded-3xl p-6 shadow-xl backdrop-blur-md space-y-4">
             {cartItems.map((item) => (
-              <div key={item.id} className="flex items-center justify-between bg-purple-950/60 p-4 rounded-2xl border border-purple-800/60">
+              <div key={item.id} className="flex items-center justify-between bg-purple-900/40 p-4 rounded-2xl border border-purple-800/50">
                 <div className="flex items-center space-x-4">
                   <input
                     type="checkbox"
                     checked={selectedItems.includes(item.id)}
                     onChange={() => toggleSelect(item.id)}
-                    className="w-4 h-4 accent-orange-500 cursor-pointer"
+                    className="w-5 h-5 accent-orange-500 cursor-pointer rounded"
                   />
-                  <img src={item.imageUrl || 'https://via.placeholder.com/80'} alt={item.name} className="w-16 h-16 object-cover rounded-xl border border-purple-700" />
+                  <div className="w-16 h-16 bg-purple-950 rounded-xl overflow-hidden flex items-center justify-center border border-purple-700/50">
+                    {item.imageUrl ? (
+                      <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span>🐾</span>
+                    )}
+                  </div>
                   <div>
                     <h3 className="font-bold text-sm text-white">{item.name}</h3>
-                    <p className="text-xs text-orange-400 font-semibold">Rp {Number(item.price).toLocaleString('id-ID')}</p>
+                    <p className="text-xs text-orange-400 font-semibold mt-1">Rp {Number(item.price).toLocaleString('id-ID')}</p>
                   </div>
                 </div>
               </div>
@@ -84,7 +84,8 @@ export default function CartPage() {
             </div>
           </div>
         ) : (
-          <div className="text-center py-20 bg-purple-900/30 rounded-3xl border border-purple-800/50 space-y-4">
+          <div className="text-center py-20 bg-purple-900/20 rounded-3xl border border-purple-800/40 space-y-4">
+            <span className="text-5xl block">🛒</span>
             <p className="text-purple-300 text-sm">Keranjang kamu masih kosong 🐾</p>
             <Link href="/home" className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl text-xs font-bold transition">
               Mulai Belanja

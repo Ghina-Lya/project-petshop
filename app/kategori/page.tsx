@@ -1,6 +1,9 @@
+'use client';
+
 import { getProducts, getTopCategories } from "../lib/actions";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -10,15 +13,31 @@ function formatPrice(price: number) {
   }).format(price);
 }
 
-async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?: string; sub?: string }> }) {
-  const params = await searchParams;
-  const typeFilter = params.type || 'dog'; 
-  const subFilter = params.sub ? Number(params.sub) : undefined;
+function CategoryContent() {
+  const searchParams = useSearchParams();
+  const typeFilter = searchParams.get('type') || 'dog';
+  const subFilterParam = searchParams.get('sub');
+  const subFilter = subFilterParam ? Number(subFilterParam) : undefined;
 
-  const [products, categories]: [any, any] = await Promise.all([
-    getProducts(subFilter),
-    getTopCategories()
-  ]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showPopup, setShowPopup] = useState(false);
+  const [purchasedItem, setPurchasedItem] = useState('');
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const [prodData, catData] = await Promise.all([
+        getProducts(subFilter),
+        getTopCategories()
+      ]);
+      setProducts(prodData);
+      setCategories(catData);
+      setLoading(false);
+    }
+    fetchData();
+  }, [subFilter]);
 
   const currentParent = categories.find((c: any) => c.slug === typeFilter || c.type === typeFilter);
 
@@ -32,8 +51,27 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
     return true;
   });
 
+  // Fungsi Tambah ke Keranjang
+  const addToCart = (product: any) => {
+    const existingCart = JSON.parse(localStorage.getItem('petshop_cart') || '[]');
+    const isExist = existingCart.find((item: any) => item.id === product.id);
+    if (!isExist) {
+      existingCart.push(product);
+      localStorage.setItem('petshop_cart', JSON.stringify(existingCart));
+      alert('Yeay! Produk berhasil dimasukkan ke keranjang 🛒');
+    } else {
+      alert('Produk ini sudah ada di dalam keranjang.');
+    }
+  };
+
+  // Fungsi Langsung Checkout dari Card
+  const handleCardCheckout = (product: any) => {
+    setPurchasedItem(product.name);
+    setShowPopup(true);
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative">
       {/* Header & Filter Subkategori */}
       <div className="bg-purple-900/40 border border-purple-700/30 p-6 md:p-8 rounded-3xl backdrop-blur-md shadow-xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -46,7 +84,6 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
           </div>
         </div>
         
-        {/* Tombol Pilihan Subkategori (Responsif Scroll Horizontal di HP) */}
         <div className="flex flex-wrap gap-2.5">
           <Link
             href={`/kategori?type=${typeFilter}`}
@@ -75,8 +112,10 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
         </div>
       </div>
 
-      {/* Grid Produk Responsif */}
-      {filteredProducts.length === 0 ? (
+      {/* Grid Produk */}
+      {loading ? (
+        <div className="text-center py-20 text-orange-400 font-semibold text-lg">Memuat data produk...</div>
+      ) : filteredProducts.length === 0 ? (
         <div className="bg-purple-900/20 border border-purple-800/40 rounded-3xl p-12 text-center">
           <span className="text-5xl mb-3 block">📦</span>
           <p className="text-purple-300 font-medium text-lg">Belum ada produk untuk kategori ini.</p>
@@ -108,24 +147,56 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
                   </p>
                 </div>
               </div>
-              <div className="p-5 pt-0 flex justify-between items-center mt-4">
-                <span className="font-black text-orange-400 text-lg sm:text-xl">{formatPrice(p.price)}</span>
-                <button className="bg-orange-500/20 hover:bg-orange-500 text-orange-300 hover:text-white border border-orange-500/40 text-xs font-bold px-4 py-2 rounded-xl transition-all">
-                  Beli Produk
-                </button>
+
+              {/* Harga & 2 Tombol (Keranjang & Checkout) */}
+              <div className="p-5 pt-0 space-y-3 mt-4">
+                <span className="font-black text-orange-400 text-lg sm:text-xl block">{formatPrice(p.price)}</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => addToCart(p)}
+                    className="flex-1 bg-purple-800 hover:bg-purple-700 text-purple-200 hover:text-white border border-purple-600/50 text-xs font-bold py-2.5 rounded-xl transition-all shadow-sm"
+                  >
+                    🛒 + Keranjang
+                  </button>
+                  <button
+                    onClick={() => handleCardCheckout(p)}
+                    className="flex-1 bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-xs font-bold py-2.5 rounded-xl transition-all shadow-md shadow-orange-500/20"
+                  >
+                    ⚡ Checkout
+                  </button>
+                </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pop-up Notifikasi Berhasil Checkout Sederhana */}
+      {showPopup && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="bg-purple-900 border border-purple-700 p-6 rounded-3xl max-w-sm w-full text-center space-y-4 shadow-2xl">
+            <div className="text-4xl">🎉</div>
+            <h3 className="text-lg font-bold text-orange-400">Checkout Berhasil!</h3>
+            <p className="text-xs text-purple-200">
+              Pesanan untuk <span className="font-semibold text-white">{purchasedItem}</span> berhasil diproses. Terima kasih telah berbelanja!
+            </p>
+            <button
+              onClick={() => setShowPopup(false)}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-xs font-bold uppercase transition shadow-md"
+            >
+              Tutup
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-export default function KategoriPage({ searchParams }: { searchParams: Promise<{ type?: string; sub?: string }> }) {
+export default function KategoriPage() {
   return (
-    <Suspense fallback={<div className="text-center py-20 text-orange-400 font-semibold text-lg">Memuat data produk dari database...</div>}>
-      <CategoryContent searchParams={searchParams} />
+    <Suspense fallback={<div className="text-center py-20 text-orange-400 font-semibold text-lg">Memuat halaman kategori...</div>}>
+      <CategoryContent />
     </Suspense>
   );
 }
