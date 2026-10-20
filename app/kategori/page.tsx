@@ -22,8 +22,6 @@ function CategoryContent() {
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showPopup, setShowPopup] = useState(false);
-  const [purchasedItem, setPurchasedItem] = useState('');
 
   useEffect(() => {
     async function fetchData() {
@@ -51,27 +49,26 @@ function CategoryContent() {
     return true;
   });
 
-  // Fungsi Tambah ke Keranjang
+  // Notifikasi Keranjang pakai alert bawaan browser
   const addToCart = (product: any) => {
     const existingCart = JSON.parse(localStorage.getItem('petshop_cart') || '[]');
     const isExist = existingCart.find((item: any) => item.id === product.id);
     if (!isExist) {
       existingCart.push(product);
       localStorage.setItem('petshop_cart', JSON.stringify(existingCart));
-      alert('Yeay! Produk berhasil dimasukkan ke keranjang 🛒');
+      alert(`Yeay! Produk "${product.name}" berhasil dimasukkan ke keranjang 🛒`);
     } else {
-      alert('Produk ini sudah ada di dalam keranjang.');
+      alert(`Produk "${product.name}" sudah ada di dalam keranjang.`);
     }
   };
 
-  // Fungsi Langsung Checkout dari Card
+  // Notifikasi Checkout pakai alert bawaan browser juga
   const handleCardCheckout = (product: any) => {
-    setPurchasedItem(product.name);
-    setShowPopup(true);
+    alert(`⚡ Checkout Berhasil!\n\nPesanan untuk "${product.name}" (${formatPrice(product.price)}) sedang diproses. Terima kasih telah berbelanja di PetShop Daifok!`);
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header & Filter Subkategori */}
       <div className="bg-purple-900/40 border border-purple-700/30 p-6 md:p-8 rounded-3xl backdrop-blur-md shadow-xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -168,25 +165,6 @@ function CategoryContent() {
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Pop-up Notifikasi Berhasil Checkout Sederhana */}
-      {showPopup && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-purple-900 border border-purple-700 p-6 rounded-3xl max-w-sm w-full text-center space-y-4 shadow-2xl">
-            <div className="text-4xl">🎉</div>
-            <h3 className="text-lg font-bold text-orange-400">Checkout Berhasil!</h3>
-            <p className="text-xs text-purple-200">
-              Pesanan untuk <span className="font-semibold text-white">{purchasedItem}</span> berhasil diproses. Terima kasih telah berbelanja!
-            </p>
-            <button
-              onClick={() => setShowPopup(false)}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-xs font-bold uppercase transition shadow-md"
-            >
-              Tutup
-            </button>
-          </div>
         </div>
       )}
     </div>
