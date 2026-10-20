@@ -98,33 +98,5 @@ export async function loginUser(formData: FormData) {
     throw new Error("Email atau password salah!");
   }
 
-  // Semua user (baik admin maupun customer) langsung diarahkan ke /home tanpa folder admin
   redirect('/home');
-}
-
-export async function addProduct(formData: FormData) {
-  const name = formData.get('name') as string;
-  const description = formData.get('description') as string;
-  const price = Number(formData.get('price'));
-  const stock = Number(formData.get('stock'));
-  const imageUrl = formData.get('imageUrl') as string;
-  const categoryId = Number(formData.get('categoryId'));
-
-  try {
-    await db.query(
-      "INSERT INTO Product (name, description, price, stock, imageUrl, categoryId) VALUES (?, ?, ?, ?, ?, ?)",
-      [name, description, price, stock, imageUrl, categoryId]
-    );
-  } catch (error) {
-    console.error("Add product error:", error);
-  }
-  redirect('/home');
-}
-
-export async function deleteProduct(id: number) {
-  try {
-    await db.query("DELETE FROM Product WHERE id = ?", [id]);
-  } catch (error) {
-    console.error("Delete product error:", error);
-  }
 }
