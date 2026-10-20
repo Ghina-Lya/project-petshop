@@ -1,11 +1,9 @@
-import { connection } from 'next/server';
+export const instant = false;
+
 import { db } from '@/app/lib/db';
 import Link from 'next/link';
 
 export default async function AdminProductsPage() {
-  // Memaksa halaman dirender secara dinamis untuk kompatibilitas Next.js 16+
-  await connection();
-
   let products: any = [];
   try {
     const [rows]: any = await db.query("SELECT p.*, c.name as categoryName FROM Product p LEFT JOIN Category c ON p.categoryId = c.id ORDER BY p.id DESC");
