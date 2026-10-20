@@ -12,7 +12,7 @@ function formatPrice(price: number) {
 
 async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?: string; sub?: string }> }) {
   const params = await searchParams;
-  const typeFilter = params.type || 'dog'; // 'dog' atau 'cat'
+  const typeFilter = params.type || 'dog'; 
   const subFilter = params.sub ? Number(params.sub) : undefined;
 
   const [products, categories]: [any, any] = await Promise.all([
@@ -20,10 +20,8 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
     getTopCategories()
   ]);
 
-  // Cari parent kategori berdasarkan tipe (Anjing / Kucing)
   const currentParent = categories.find((c: any) => c.slug === typeFilter || c.type === typeFilter);
 
-  // Filter produk berdasarkan subkategori atau tipe induknya
   const filteredProducts = products.filter((p: any) => {
     if (subFilter) return p.categoryId === subFilter;
     if (typeFilter) {
@@ -35,7 +33,7 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
   });
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header & Filter Subkategori */}
       <div className="bg-purple-900/40 border border-purple-700/30 p-6 md:p-8 rounded-3xl backdrop-blur-md shadow-xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -48,13 +46,13 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
           </div>
         </div>
         
-        {/* Tombol Pilihan Subkategori */}
+        {/* Tombol Pilihan Subkategori (Responsif Scroll Horizontal di HP) */}
         <div className="flex flex-wrap gap-2.5">
           <Link
             href={`/kategori?type=${typeFilter}`}
-            className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm ${
+            className={`px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm ${
               !subFilter 
-                ? "bg-linear-to-r from-orange-500 to-amber-500 text-white shadow-orange-500/30" 
+                ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-orange-500/30" 
                 : "bg-purple-950/60 border border-purple-700/40 text-purple-200 hover:bg-purple-800/50"
             }`}
           >
@@ -65,9 +63,9 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
             <Link
               key={sub.id}
               href={`/kategori?type=${typeFilter}&sub=${sub.id}`}
-              className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm ${
+              className={`px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm ${
                 subFilter === sub.id
-                  ? "bg-linear-to-r from-orange-500 to-amber-500 text-white shadow-orange-500/30"
+                  ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-orange-500/30"
                   : "bg-purple-950/60 border border-purple-700/40 text-purple-200 hover:bg-purple-800/50"
               }`}
             >
@@ -77,7 +75,7 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
         </div>
       </div>
 
-      {/* Grid Produk */}
+      {/* Grid Produk Responsif */}
       {filteredProducts.length === 0 ? (
         <div className="bg-purple-900/20 border border-purple-800/40 rounded-3xl p-12 text-center">
           <span className="text-5xl mb-3 block">📦</span>
@@ -111,7 +109,7 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
                 </div>
               </div>
               <div className="p-5 pt-0 flex justify-between items-center mt-4">
-                <span className="font-black text-orange-400 text-xl">{formatPrice(p.price)}</span>
+                <span className="font-black text-orange-400 text-lg sm:text-xl">{formatPrice(p.price)}</span>
                 <button className="bg-orange-500/20 hover:bg-orange-500 text-orange-300 hover:text-white border border-orange-500/40 text-xs font-bold px-4 py-2 rounded-xl transition-all">
                   Beli Produk
                 </button>
@@ -126,7 +124,7 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
 
 export default function KategoriPage({ searchParams }: { searchParams: Promise<{ type?: string; sub?: string }> }) {
   return (
-    <Suspense fallback={<div className="text-center py-16 text-orange-400 font-semibold text-lg">Memuat data produk dari database...</div>}>
+    <Suspense fallback={<div className="text-center py-20 text-orange-400 font-semibold text-lg">Memuat data produk dari database...</div>}>
       <CategoryContent searchParams={searchParams} />
     </Suspense>
   );
