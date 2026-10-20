@@ -73,7 +73,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white py-3 rounded-xl tracking-widest font-bold uppercase transition shadow-lg shadow-orange-500/20 disabled:opacity-50"
+            className="w-full bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white py-3 rounded-xl tracking-widest font-bold uppercase transition shadow-lg shadow-orange-500/20 disabled:opacity-50"
           >
             {loading ? 'Memproses...' : 'Daftar Sekarang'}
           </button>
