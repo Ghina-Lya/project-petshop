@@ -98,12 +98,8 @@ export async function loginUser(formData: FormData) {
     throw new Error("Email atau password salah!");
   }
 
-  const user = rows[0];
-  if (user.role === 'admin') {
-    redirect('/admin/products');
-  } else {
-    redirect('/home');
-  }
+  // Semua user (baik admin maupun customer) langsung diarahkan ke /home tanpa folder admin
+  redirect('/home');
 }
 
 export async function addProduct(formData: FormData) {
@@ -122,7 +118,7 @@ export async function addProduct(formData: FormData) {
   } catch (error) {
     console.error("Add product error:", error);
   }
-  redirect('/admin/products');
+  redirect('/home');
 }
 
 export async function deleteProduct(id: number) {
