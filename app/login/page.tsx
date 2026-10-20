@@ -1,3 +1,4 @@
+'use type';
 'use client';
 
 import { useState } from 'react';
@@ -16,9 +17,8 @@ export default function LoginPage() {
     try {
       await loginUser(formData);
     } catch (err: any) {
-      // Mengabaikan error NEXT_REDIRECT agar tidak memicu alert error palsu
-      if (err.message?.includes('NEXT_REDIRECT') || err.digest?.includes('NEXT_REDIRECT')) {
-        return;
+      if (err.message?.includes('NEXT_REDIRECT') || err.digest?.includes('NEXT_REDIRECT') || err.name === 'AbortError') {
+        return; // Redirect berhasil, abaikan
       }
       setError(err.message || 'Terjadi kesalahan saat masuk.');
       setLoading(false);
@@ -27,9 +27,9 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-purple-950 flex items-center justify-center px-4 sm:px-6 py-8 font-sans text-white">
-      <div className="bg-purple-950/90 border border-purple-800/80 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full space-y-6 backdrop-blur-xl">
+      <div className="bg-purple-900/80 border border-purple-800 p-6 sm:p-8 rounded-3xl shadow-2xl max-w-md w-full space-y-6 backdrop-blur-xl">
         <div className="text-center space-y-2">
-          <Link href="/home" className="text-lg sm:text-xl tracking-widest font-bold uppercase text-orange-400 hover:text-orange-300 transition">
+          <Link href="/home" className="text-lg sm:text-xl tracking-widest font-bold uppercase text-orange-400 hover:text-orange-300">
             🐾 PetShop Daifok
           </Link>
           <h1 className="text-xs sm:text-sm tracking-wider font-semibold text-purple-200">Masuk ke Akun Anda</h1>
@@ -44,7 +44,7 @@ export default function LoginPage() {
               type="email"
               name="email"
               required
-              className="w-full p-3 rounded-xl border border-purple-700/60 bg-purple-900/50 text-white outline-none focus:border-orange-400 transition"
+              className="w-full p-3 rounded-xl border border-purple-700 bg-purple-950 text-white outline-none focus:border-orange-400"
               placeholder="ex@email.com"
             />
           </div>
@@ -55,7 +55,7 @@ export default function LoginPage() {
               type="password"
               name="password"
               required
-              className="w-full p-3 rounded-xl border border-purple-700/60 bg-purple-900/50 text-white outline-none focus:border-orange-400 transition"
+              className="w-full p-3 rounded-xl border border-purple-700 bg-purple-950 text-white outline-none focus:border-orange-400"
               placeholder="••••••••"
             />
           </div>
@@ -63,7 +63,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white py-3 rounded-xl tracking-widest font-bold uppercase transition shadow-lg shadow-orange-500/20 disabled:opacity-50"
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl tracking-widest font-bold uppercase transition shadow-md disabled:opacity-50"
           >
             {loading ? 'Memproses...' : 'Masuk'}
           </button>

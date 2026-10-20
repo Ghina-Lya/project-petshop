@@ -52,7 +52,7 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
             href={`/kategori?type=${typeFilter}`}
             className={`px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm ${
               !subFilter 
-                ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-orange-500/30" 
+                ? "bg-linear-to-r from-orange-500 to-amber-500 text-white shadow-orange-500/30" 
                 : "bg-purple-950/60 border border-purple-700/40 text-purple-200 hover:bg-purple-800/50"
             }`}
           >
@@ -65,7 +65,7 @@ async function CategoryContent({ searchParams }: { searchParams: Promise<{ type?
               href={`/kategori?type=${typeFilter}&sub=${sub.id}`}
               className={`px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all shadow-sm ${
                 subFilter === sub.id
-                  ? "bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-orange-500/30"
+                  ? "bg-linear-to-r from-orange-500 to-amber-500 text-white shadow-orange-500/30"
                   : "bg-purple-950/60 border border-purple-700/40 text-purple-200 hover:bg-purple-800/50"
               }`}
             >

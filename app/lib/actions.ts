@@ -71,7 +71,7 @@ export async function registerUser(formData: FormData) {
       "INSERT INTO Users (name, email, password, role) VALUES (?, ?, ?, 'customer')",
       [name, email, password]
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Register error:", error);
     throw new Error("Email sudah terdaftar atau terjadi kesalahan database.");
   }
