@@ -7,6 +7,7 @@ import { loginUser } from '../lib/actions';
 export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State untuk toggle password
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -16,7 +17,6 @@ export default function LoginPage() {
     try {
       await loginUser(formData);
     } catch (err: any) {
-      // Abaikan error redirect Next.js agar navigasi berjalan sukses
       if (err.message?.includes('NEXT_REDIRECT') || err.digest?.includes('NEXT_REDIRECT')) {
         return;
       }
@@ -51,19 +51,28 @@ export default function LoginPage() {
 
           <div>
             <label className="font-semibold text-purple-200 block mb-1">Password</label>
-            <input
-              type="password"
-              name="password"
-              required
-              className="w-full p-3 rounded-xl border border-purple-700 bg-purple-950 text-white outline-none focus:border-orange-400 transition"
-              placeholder="••••••••"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                required
+                className="w-full p-3 pr-10 rounded-xl border border-purple-700 bg-purple-950 text-white outline-none focus:border-orange-400 transition"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-300 hover:text-white text-sm focus:outline-none"
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white py-3 rounded-xl tracking-widest font-bold uppercase transition shadow-lg shadow-orange-500/20 disabled:opacity-50"
+            className="w-full bg-linear-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white py-3 rounded-xl tracking-widest font-bold uppercase transition shadow-lg shadow-orange-500/20 disabled:opacity-50 cursor-pointer"
           >
             {loading ? 'Memproses...' : 'Masuk'}
           </button>

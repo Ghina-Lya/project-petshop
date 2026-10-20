@@ -1,6 +1,5 @@
 'use client';
 
-import type { Metadata } from "next";
 import "./globals.css";
 import { usePathname } from "next/navigation";
 import Navbar from "./components/Navbar";
@@ -11,6 +10,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  // Sembunyikan navbar jika sedang berada di halaman login atau register
   const isAuthPage = pathname === '/login' || pathname === '/register';
 
   return (
